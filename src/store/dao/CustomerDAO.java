@@ -16,16 +16,19 @@ public class CustomerDAO implements DataAccess<Customer>{
     String dbuser = Parms.dbuser;
     String dbpass = Parms.dbpass;
     String dburl = Parms.dburl;
+
+    String driver = "org.postgresql.Driver";
 	
+    // Returns a List of ALL Customers
     public List<Customer> getAll(){
         
         List<Customer> list = new LinkedList<Customer>();
         
         try{
-            Class.forName("com.ibm.db2.jcc.DB2Driver");    
+            Class.forName(driver);    
             con = DriverManager.getConnection(dburl, dbuser, dbpass);
             
-            String sql = "SELECT * FROM CUSTOMERS";
+            String sql = "SELECT * FROM STOREDB.CUSTOMERS";
 
             pstmt = con.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();             
@@ -44,15 +47,16 @@ public class CustomerDAO implements DataAccess<Customer>{
         return list;
     }
     
+    // Returns a Customer object given a CUSTOMER_ID
     public Customer getItem(int key){
         
         Customer cust = null;
         
         try{
-            Class.forName("com.ibm.db2.jcc.DB2Driver");            
+            Class.forName(driver);            
             con = DriverManager.getConnection(dburl, dbuser, dbpass);
             
-            String sql = "SELECT * FROM CUSTOMERS WHERE CUSTOMER_ID = (?)";
+            String sql = "SELECT * FROM STOREDB.CUSTOMERS WHERE CUSTOMER_ID = (?)";
 
             pstmt = con.prepareStatement(sql);
             pstmt.setString(1, String.valueOf(key));

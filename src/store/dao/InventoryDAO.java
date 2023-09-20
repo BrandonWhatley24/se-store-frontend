@@ -12,20 +12,23 @@ public class InventoryDAO implements DataAccess<Inventory> {
     
 	Connection con;
     PreparedStatement pstmt;
-        
+    
     String dbuser = Parms.dbuser;
     String dbpass = Parms.dbpass;
     String dburl = Parms.dburl;
+    
+    String driver = "org.postgresql.Driver";
         
+    // Returns a List of ALL Inventory
     public List<Inventory> getAll(){
         
         List<Inventory> list = new LinkedList<Inventory>();
         
         try{
-            Class.forName("com.ibm.db2.jcc.DB2Driver");        
+            Class.forName(driver);        
             con = DriverManager.getConnection(dburl, dbuser, dbpass);
         
-            String sql = "SELECT * FROM INVENTORY";
+            String sql = "SELECT * FROM STOREDB.INVENTORY";
 
             pstmt = con.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
@@ -44,15 +47,16 @@ public class InventoryDAO implements DataAccess<Inventory> {
         return list;
     }
     
+    // Returns an Inventory object given its INV_ID
     public Inventory getItem(int key){
         
         Inventory inv = null;
         
         try{
-            Class.forName("com.ibm.db2.jcc.DB2Driver");    
+            Class.forName(driver);    
             con = DriverManager.getConnection(dburl, dbuser, dbpass);
             
-            String sql = "SELECT * FROM INVENTORY WHERE INV_ID = (?)";
+            String sql = "SELECT * FROM STOREDB.INVENTORY WHERE INV_ID = (?)";
 
             pstmt = con.prepareStatement(sql);
             pstmt.setString(1, String.valueOf(key));
@@ -81,10 +85,10 @@ public class InventoryDAO implements DataAccess<Inventory> {
     public void updateQtyOnHand(int invID, int qty){
         
     	try{
-            Class.forName("com.ibm.db2.jcc.DB2Driver");                
+            Class.forName(driver);                
             con = DriverManager.getConnection(dburl, dbuser, dbpass);
             
-            String sql = "UPDATE INVENTORY SET QTY_ON_HAND = INV_QTY_ONHAND + (?) WHERE INV_ID = (?)";
+            String sql = "UPDATE STOREDB.INVENTORY SET QTY_ON_HAND = INV_QTY_ONHAND + (?) WHERE INV_ID = (?)";
         	
             pstmt = con.prepareStatement(sql);
             pstmt.setString(1, String.valueOf(qty));
