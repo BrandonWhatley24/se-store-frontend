@@ -9,7 +9,7 @@
           <v-col cols="1"></v-col>
           <v-col cols="10">
             <v-text-field v-model="username" label="Username" filled></v-text-field>
-            <v-text-field v-model="password" label="Password" filled></v-text-field>
+            <v-text-field v-model="password" type="password" label="Password" filled></v-text-field>
             <v-btn block @click="loginFunction">
               Login
             </v-btn>
@@ -31,15 +31,24 @@ export default {
     username: "",
     password: "",
     savedUsers: [
-      "TestUser"
+      {username: "TestUser", password: "userTestPass"}
     ],
-    savedPasswords: [
-      "userTestPass"
-    ]
   }),
   methods: {
     loginFunction(){
-      console.log("This is a test")
+      let username = this.username;
+      let password = this.password;
+      let userFound = false;
+
+      for(let i = 0; i < this.savedUsers.length; i++){
+        if(this.savedUsers[i].username.toUpperCase === username.toUpperCase && password === this.savedUsers[i].username){
+          userFound = true;
+        }
+      }
+
+      if(userFound){
+        console.log()
+      }
     }
   }
 }
