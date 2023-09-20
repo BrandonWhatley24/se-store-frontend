@@ -187,6 +187,8 @@ export default {
   }),
   methods: {
     loginFunction() {
+
+      window.HELLO.test("Webview");
       let username = this.username;
       let password = this.password;
       let userFound = false;
@@ -211,8 +213,6 @@ export default {
       }
     },
     addItemToCart(item) {
-
-      console.log("TEXT");
       this.showCurrentCart = true;
 
       this.currentItemInCart.title = item.item;
