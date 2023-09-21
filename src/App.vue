@@ -187,6 +187,7 @@ export default {
   }),
   methods: {
     loginFunction() {
+
       let username = this.username;
       let password = this.password;
       let userFound = false;
@@ -211,8 +212,6 @@ export default {
       }
     },
     addItemToCart(item) {
-
-      console.log("TEXT");
       this.showCurrentCart = true;
 
       this.currentItemInCart.title = item.item;
