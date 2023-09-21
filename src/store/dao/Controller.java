@@ -10,52 +10,62 @@ import org.springframework.web.bind.annotation.RestController;
 public class Controller {
     
  @Autowired
- private CustomerDAO cDao;
- private InventoryDAO iDao;
- private OrderDAO oDao;
+ private CustomerDAO cdao;
+ private InventoryDAO idao;
+ private OrderDAO odao;
  
+
+ // Returns a List of all Customers
  @GetMapping("/customer/getAll")
  public List<Customer> getAllCustomers() {
-     return cDao.getAll();
+    return cdao.getAll();
  }
  
+ // Returns a Customer item, given a CustomerID
  @GetMapping("/customer/getItem")
  public Customer getCustomer(int key) {
-	 return cDao.getItem(key);
+	return cdao.getItem(key);
  }
  
+ // Returns a List of all Inventory
  @GetMapping("/inventory/getAll")
  public List<Inventory> getAllInventory() {
-     return iDao.getAll();
+    return idao.getAll();
  }
  
+ // Returns an Inventory item, given an InvID
  @GetMapping("/inventory/getItem")
  public Inventory get(int key) {
-     return iDao.getItem(key);
+    return idao.getItem(key);
  }
  
+ // Updates the qty, given an InvID
  @GetMapping("/inventory/updateQty")
  public void updateQtyOnHand(int invID, int qty){
-	 iDao.updateQtyOnHand(invID, qty);
+    idao.updateQtyOnHand(invID, qty);
  } 
-	 
+
+ // Returns a List of all Orders
  @GetMapping("/order/getAll")
  public List<Order> getAllOrders() {
-     return oDao.getAll();
+    return odao.getAll();
  }
  
+ // Returns a List of all Orders belonging to a specific Customer, given an CustomerID
  @GetMapping("/order/getCustOrders")
  public List<Order> getCustOrders(int key){
-     return oDao.getCustOrders(key);
+    return odao.getCustOrders(key);
  }
  
+ // Returns an Order item, given an OrderID
  @GetMapping("/order/getItem")
  public Order getOrder(int key) {
-	 return oDao.getItem(key);
+	return odao.getItem(key);
  }
  
+ // Inserts an Order, given an Order item
  @GetMapping("/order/insert")
  public void insert(Order item){
-     insert(item);
+     odao.insert(item);
  }
 }
