@@ -16,17 +16,19 @@ public class OrderDAO implements DataAccess<Order>{
     String dbuser = Parms.dbuser;
     String dbpass = Parms.dbpass;
     String dburl = Parms.dburl;    
+
+    String driver = "org.postgresql.Driver";
     
-    // Used to view orders for ALL customers
+    // Returns a List of ALL Orders
     public List<Order> getAll(){
         
         List<Order> list = new LinkedList<Order>();
         
         try{
-            Class.forName("com.ibm.db2.jcc.DB2Driver");
+            Class.forName(driver);
             con = DriverManager.getConnection(dburl, dbuser, dbpass);
             
-            String sql = "SELECT * FROM ORDERS";
+            String sql = "SELECT * FROM STOREDB.ORDERS";
             
             pstmt = con.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
@@ -45,16 +47,16 @@ public class OrderDAO implements DataAccess<Order>{
         return list;
     }
     
-    // Used to retrieve a specific customer's order
+    // Returns a List of a specific customer's orders given their CUSTOMER_ID
     public List<Order> getCustOrders(int key){
         
         List<Order> list = new LinkedList<Order>();
         
         try{
-            Class.forName("com.ibm.db2.jcc.DB2Driver");
+            Class.forName(driver);
             con = DriverManager.getConnection(dburl, dbuser, dbpass);
             
-            String sql = "SELECT * FROM ORDERS WHERE CUSTOMER_ID = (?) ORDER BY ORDER_ID";
+            String sql = "SELECT * FROM STOREDB.ORDERS WHERE CUSTOMER_ID = (?) ORDER BY ORDER_ID";
             
             pstmt = con.prepareStatement(sql);
             pstmt.setString(1, String.valueOf(key));
@@ -74,15 +76,16 @@ public class OrderDAO implements DataAccess<Order>{
         return list;
     }
     
+    // Returns an Order object from an ORDER_ID
     public Order getItem(int key){
         
         Order order = null;
         
         try{
-            Class.forName("com.ibm.db2.jcc.DB2Driver");                
+            Class.forName(driver);                
             con = DriverManager.getConnection(dburl, dbuser, dbpass);           
 
-            String sql = "SELECT * FROM ORDERS WHERE ORDER_ID = (?)";
+            String sql = "SELECT * FROM STOREDB.ORDERS WHERE ORDER_ID = (?)";
             
             pstmt = con.prepareStatement(sql);
             pstmt.setString(1, String.valueOf(key));
@@ -113,10 +116,10 @@ public class OrderDAO implements DataAccess<Order>{
                 
         try{
         	
-            Class.forName("com.ibm.db2.jcc.DB2Driver");    
+            Class.forName(driver);    
             con = DriverManager.getConnection(dburl, dbuser, dbpass);
             
-            String sql = "INSERT INTO ORDERS (CUSTOMER_ID, INV_ID, QTY, STATUS, PENDING, DATE_ORDERED, DATE_EXPECTED) VALUES( ? , ? , ? , ? , ? , ? , ? )";
+            String sql = "INSERT INTO STOREDB.ORDERS (CUSTOMER_ID, INV_ID, QTY, STATUS, PENDING, DATE_ORDERED, DATE_EXPECTED) VALUES( ? , ? , ? , ? , ? , ? , ? )";
         
             pstmt = con.prepareStatement(sql);
             pstmt.setInt(1, item.getCustID());
