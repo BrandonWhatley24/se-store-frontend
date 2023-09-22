@@ -1,14 +1,12 @@
 <template>
-  <v-app>
+  <v-app style="background-color: #91C8E4;">
 
     <!--Bar at the top-->
-    <v-app-bar app color="primary" dark>
+    <v-app-bar app color="#4682A9" dark>
       <div class="d-flex align-center">
-        <v-img alt="Vuetify Logo" class="shrink mr-2" contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png" transition="scale-transition" width="40" @click="openMainPage"/>
+        <v-img src="./Tux_Logo.png" width="50px" @click="logoClick"></v-img>
+        <v-img src="./text.png" width="300px" @click="logoClick"></v-img>
 
-        <v-img alt="Vuetify Name" class="shrink mt-1 hidden-sm-and-down" contain min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png" width="100" @click="openMainPage" />
       </div>
 
       <v-spacer></v-spacer>
@@ -21,117 +19,129 @@
         </template>
         <v-list>
           <v-list-item>
-          <v-btn block @click="openTransactions" >View Transactions</v-btn>
+            <v-btn block @click="openTransactions">View Transactions</v-btn>
           </v-list-item>
 
           <v-list-item>
-          <v-btn block @click="signOut">Sign Out</v-btn>
-        </v-list-item>
+            <v-btn block @click="signOut">Sign Out</v-btn>
+          </v-list-item>
         </v-list>
       </v-menu>
 
 
     </v-app-bar>
+    <div class="background">
+      <v-main>
 
-    <v-main>
+        <!--Login Page-->
+        <div v-show="showLoginPage">
+          <v-row>
+            <v-col cols="3">
+            </v-col>
+            <v-col cols="6" align="center" justify="center" class="mt-3">
+              <v-card elevation="3" outlined width="50%" style="background-color:#F6F4EB">
+                <v-card-title class="justify-center">Login</v-card-title>
+                <v-col cols="1"></v-col>
+                <v-col cols="10">
+                  <v-text-field v-model="username" label="Username" filled></v-text-field>
+                  <v-text-field v-model="password" type="password" label="Password" filled></v-text-field>
+                  <v-btn block @click="loginFunction" color="#B0D9B1">
+                    Login
+                  </v-btn>
+                </v-col>
+                <v-col cols="1"></v-col>
+              </v-card>
+            </v-col>
+            <v-col cols="3">
+            </v-col>
+          </v-row>
 
-      <!--Login Page-->
-      <div v-show="showLoginPage">
-        <v-row>
-          <v-col cols="3">
-          </v-col>
-          <v-col cols="6" align="center" justify="center" class="mt-3">
-            <v-card elevation="3" outlined width="50%">
-              <v-card-title class="justify-center">Login</v-card-title>
-              <v-col cols="1"></v-col>
-              <v-col cols="10">
-                <v-text-field v-model="username" label="Username" filled></v-text-field>
-                <v-text-field v-model="password" type="password" label="Password" filled></v-text-field>
-                <v-btn block @click="loginFunction">
-                  Login
-                </v-btn>
-              </v-col>
-              <v-col cols="1"></v-col>
+          <v-snackbar v-model="showSnackbar" :timeout="snackbarTimeout" color="#F78CA2"> {{ snackbarText }}</v-snackbar>
+        </div>
+
+        <!--Main Page-->
+        <div v-show="showMainPage">
+          <v-row v-show="showCurrentCart" width="100%" class="ml-2 mr-2 mb-4 mt-4">
+            <v-card color="#749BC2" width="100%" class="mt-4 ml-3 mr-3 ">
+              <v-card-title>
+                Current Cart
+              </v-card-title>
             </v-card>
-          </v-col>
-          <v-col cols="3">
-          </v-col>
-        </v-row>
+          </v-row>
 
-        <v-snackbar v-model="showSnackbar" :timeout="snackbarTimeout" color="error"> {{ snackbarText }}</v-snackbar>
-      </div>
+          <v-row v-show="showCurrentCart" width="100%" class="ml-2 mr-2 mb-4 mt-4">
+            <v-card width="100%" color="#F6F4EB" class="mt-4 ml-3 mr-3 pa-4">
+              <v-row>
+                <v-col cols="2">
+                  <h4 class="ma-3">
+                    {{ currentItemInCart.title }}
+                  </h4>
+                </v-col>
+                <v-col cols="3">
+                  <h4 class="ma-3">
+                    {{ currentItemInCart.category }}
+                  </h4>
+                </v-col>
+                <v-col cols="3">
+                  <h4 class="ma-3">
+                    {{ currentItemInCart.specs }}
+                  </h4>
+                </v-col>
+                <v-col cols="2">
+                  <h4 class="ma-3">
+                    {{ currentItemInCart.price }}
+                  </h4>
+                </v-col>
+                <v-col cols="2">
+                  <v-btn class="ma-1" color="#F78CA2" @click="removeFromCart">Remove</v-btn>
+                  <v-btn class="ma-1" color="#B0D9B1">Checkout</v-btn>
+                </v-col>
+              </v-row>
+            </v-card>
+          </v-row>
+          <v-row width="100%" class="ml-2 mr-2 mb-4 mt-4">
+            <v-card color="#749BC2" width="100%" class="mt-3 ml-3 mr-3 mb-3">
+              <v-card-title>
+                Current Items For Sale
+              </v-card-title>
+            </v-card>
+          </v-row>
 
-      <!--Main Page-->
-      <div v-show="showMainPage">
-        <v-row v-show="showCurrentCart">
-          <v-card color="blue" width="100%" class="mt-4 ml-3 mr-3 ">
+          <v-row width="100%" class="ml-2 mr-2 mb-4 mt-4">
+            <v-card v-for="item in itemsForSale" :key="item.id" width="23%" height="200px" color="#F6F4EB" class="ml-5 mr-4 mb-3 mt-3">
+              <v-row >
+                <v-col cols="9"><v-card-title>{{ item.item }}</v-card-title></v-col>
+                <v-col cols="3"><v-card-title>{{ item.price }}</v-card-title></v-col>
+              </v-row>
+              <v-row class="ma-0">
+                <v-col cols="7"><v-card-text>{{ item.category }}</v-card-text></v-col>
+              </v-row>
+              <v-row class="ma-0">
+                <v-col cols="6"><v-card-text>{{ item.specs }}</v-card-text></v-col>
+                <v-col cols="6"><v-btn @click="addItemToCart(item)" color="#B0D9B1">Add Item to Cart</v-btn></v-col>
+              </v-row>
+              
+              
+            </v-card>
+          </v-row>
+        </div>
+
+        <!--Transaction Page-->
+        <div v-show="showTransactions">
+          <v-card color="#749BC2" class="ml-2 mr-2 mb-4 mt-4">
             <v-card-title>
-              Current Cart
+              Transactions for {{ currentUser }}
             </v-card-title>
           </v-card>
-        </v-row>
 
-        <v-row v-show="showCurrentCart" width="100%" class="ml-2 mr-2 mb-4 mt-4">
-          <v-card width="100%" class="mt-4 ml-3 mr-3 pa-4">
-            <v-row>
-              <v-col cols="2">
-                <h4 class="ma-3">
-                  {{ currentItemInCart.title }}
-                </h4>
-              </v-col>
-              <v-col cols="3">
-                <h4 class="ma-3">
-                  {{ currentItemInCart.category }}
-                </h4>
-              </v-col>
-              <v-col cols="3">
-                <h4 class="ma-3">
-                  {{ currentItemInCart.specs }}
-                </h4>
-              </v-col>
-              <v-col cols="2">
-                <h4 class="ma-3">
-                  {{ currentItemInCart.price }}
-                </h4>
-              </v-col>
-              <v-col cols="2">
-                <v-btn class="ma-1" color="" @click="removeFromCart">Remove</v-btn>
-                <v-btn class="ma-1" color="">Checkout</v-btn>
-              </v-col>
-            </v-row>
-          </v-card>
-        </v-row>
-        <v-row>
-          <v-card color="blue" width="100%" class="mt-3 ml-3 mr-3 mb-3">
-            <v-card-title>
-              Current Items For Sale
-            </v-card-title>
-          </v-card>
-        </v-row>
+          <v-data-table :headers="headers" :items="transactions" :items-per-page="15" class="elevation-1 ml-2 mr-2 " color="#F6F4EB"
+            width="99%"></v-data-table>
 
-        <v-row>
-          <v-card v-for="item in itemsForSale" :key="item.id" width="32%" height="400px" class="ml-3 mr-3 mb-3 mt-3">
-            <v-card-title>{{ item.item }}</v-card-title>
-            <v-btn @click="addItemToCart(item)">Add Item to Cart</v-btn>
-          </v-card>
-        </v-row>
-      </div>
+          <v-btn class="ma-4" @click="openMainPage" color="#B0D9B1"> Main Page </v-btn>
+        </div>
 
-      <!--Transaction Page-->
-      <div v-show="showTransactions">
-        <v-card color="blue" class="ml-2 mr-2 mb-4 mt-4">
-          <v-card-title>
-            Transactions for {{ currentUser }}
-          </v-card-title>
-        </v-card>
-
-        <v-data-table :headers="headers" :items="transactions" :items-per-page="15" class="elevation-1 ml-2 mr-2"
-          width="99%"></v-data-table>
-
-        <v-btn class="ma-4" @click="openMainPage"> Main Page </v-btn>
-      </div>
-
-    </v-main>
+      </v-main>
+    </div>
   </v-app>
 </template>
 
@@ -153,7 +163,8 @@ export default {
     username: "",
     password: "",
     savedUsers: [
-      { username: "TestUser", password: "userTestPass", firstName: "Test", lastName: "User" }
+      { username: "TestUser", password: "userTestPass", firstName: "Test", lastName: "User" },
+      { username: "brandon", password: "whatley", firstName: "Brandon", lastName: "Whatley" }
     ],
     showSnackbar: false,
     snackbarText: "Your username or password is incorrect. Please try again",
@@ -167,6 +178,39 @@ export default {
       { id: 1, item: 'Red Shirt', category: 'Clothing', specs: 'Red', price: '29.99' },
       { id: 2, item: 'Purple Shirt', category: 'Clothing', specs: 'Purple', price: '29.99' },
       { id: 3, item: 'Yellow Shirt', category: 'Clothing', specs: 'Yellow', price: '29.99' },
+      { id: 0, item: 'Blue Shirt', category: 'Clothing', specs: 'Blue', price: '29.99' },
+      { id: 1, item: 'Red Shirt', category: 'Clothing', specs: 'Red', price: '29.99' },
+      { id: 2, item: 'Purple Shirt', category: 'Clothing', specs: 'Purple', price: '29.99' },
+      { id: 3, item: 'Yellow Shirt', category: 'Clothing', specs: 'Yellow', price: '29.99' },
+      { id: 0, item: 'Blue Shirt', category: 'Clothing', specs: 'Blue', price: '29.99' },
+      { id: 1, item: 'Red Shirt', category: 'Clothing', specs: 'Red', price: '29.99' },
+      { id: 2, item: 'Purple Shirt', category: 'Clothing', specs: 'Purple', price: '29.99' },
+      { id: 3, item: 'Yellow Shirt', category: 'Clothing', specs: 'Yellow', price: '29.99' },
+      { id: 0, item: 'Blue Shirt', category: 'Clothing', specs: 'Blue', price: '29.99' },
+      { id: 1, item: 'Red Shirt', category: 'Clothing', specs: 'Red', price: '29.99' },
+      { id: 2, item: 'Purple Shirt', category: 'Clothing', specs: 'Purple', price: '29.99' },
+      { id: 3, item: 'Yellow Shirt', category: 'Clothing', specs: 'Yellow', price: '29.99' },
+      { id: 0, item: 'Blue Shirt', category: 'Clothing', specs: 'Blue', price: '29.99' },
+      { id: 1, item: 'Red Shirt', category: 'Clothing', specs: 'Red', price: '29.99' },
+      { id: 2, item: 'Purple Shirt', category: 'Clothing', specs: 'Purple', price: '29.99' },
+      { id: 3, item: 'Yellow Shirt', category: 'Clothing', specs: 'Yellow', price: '29.99' },
+      { id: 0, item: 'Blue Shirt', category: 'Clothing', specs: 'Blue', price: '29.99' },
+      { id: 1, item: 'Red Shirt', category: 'Clothing', specs: 'Red', price: '29.99' },
+      { id: 2, item: 'Purple Shirt', category: 'Clothing', specs: 'Purple', price: '29.99' },
+      { id: 3, item: 'Yellow Shirt', category: 'Clothing', specs: 'Yellow', price: '29.99' },
+      { id: 0, item: 'Blue Shirt', category: 'Clothing', specs: 'Blue', price: '29.99' },
+      { id: 1, item: 'Red Shirt', category: 'Clothing', specs: 'Red', price: '29.99' },
+      { id: 2, item: 'Purple Shirt', category: 'Clothing', specs: 'Purple', price: '29.99' },
+      { id: 3, item: 'Yellow Shirt', category: 'Clothing', specs: 'Yellow', price: '29.99' },
+      { id: 0, item: 'Blue Shirt', category: 'Clothing', specs: 'Blue', price: '29.99' },
+      { id: 1, item: 'Red Shirt', category: 'Clothing', specs: 'Red', price: '29.99' },
+      { id: 2, item: 'Purple Shirt', category: 'Clothing', specs: 'Purple', price: '29.99' },
+      { id: 3, item: 'Yellow Shirt', category: 'Clothing', specs: 'Yellow', price: '29.99' },
+      { id: 0, item: 'Blue Shirt', category: 'Clothing', specs: 'Blue', price: '29.99' },
+      { id: 1, item: 'Red Shirt', category: 'Clothing', specs: 'Red', price: '29.99' },
+      { id: 2, item: 'Purple Shirt', category: 'Clothing', specs: 'Purple', price: '29.99' },
+      { id: 3, item: 'Yellow Shirt', category: 'Clothing', specs: 'Yellow', price: '29.99' },
+
     ],
 
     //Transactions Page
@@ -229,17 +273,24 @@ export default {
       this.currentItemInCart.specs = "";
       this.currentItemInCart.price = "";
     },
-    openTransactions(){
+    openTransactions() {
       this.showLoginPage = false;
       this.showMainPage = false;
       this.showTransactions = true;
     },
-    openMainPage(){
+    openMainPage() {
       this.showLoginPage = false;
       this.showMainPage = true;
       this.showTransactions = false;
     },
-    signOut(){
+    logoClick() {
+      if (this.showTransactions) {
+        this.showLoginPage = false;
+        this.showMainPage = true;
+        this.showTransactions = false;
+      }
+    },
+    signOut() {
       this.showLoginPage = true;
       this.showMainPage = false;
       this.showTransactions = false;
@@ -248,7 +299,13 @@ export default {
       this.password = "";
       this.currentUser = "";
       this.currentItemInCart = { id: 0, item: '', category: '', specs: '', price: '' };
+    },
+    connectToDatebase() {
+
     }
   }
 };
 </script>
+
+
+<style></style>
