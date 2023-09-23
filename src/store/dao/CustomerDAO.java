@@ -19,7 +19,7 @@ public class CustomerDAO implements DataAccess<Customer>{
 
     String driver = "org.postgresql.Driver";
 	
-    /*
+  /*  
 	public static void main(String[] args) {
 	  
 		CustomerDAO cdao = new CustomerDAO(); List<Customer> list = cdao.getAll();
@@ -30,7 +30,7 @@ public class CustomerDAO implements DataAccess<Customer>{
 		System.out.println(cust);
 		  
 	}
-	*/ 
+	*/
     
     // Returns a List of ALL Customers
     public List<Customer> getAll(){
@@ -47,7 +47,7 @@ public class CustomerDAO implements DataAccess<Customer>{
             ResultSet rs = pstmt.executeQuery();             
             
             while(rs.next()){
-                Customer cust = new Customer(rs.getInt(1), rs.getString(2));
+                Customer cust = new Customer(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4));
                 list.add(cust);
             }
             
@@ -76,7 +76,7 @@ public class CustomerDAO implements DataAccess<Customer>{
             ResultSet rs = pstmt.executeQuery();
 
             while(rs.next()){
-            	cust = new Customer(rs.getInt(1), rs.getString(2));
+            	cust = new Customer(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4));
             }
             
             con.close();

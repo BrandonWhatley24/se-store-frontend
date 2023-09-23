@@ -9,6 +9,6 @@ public class Parms {
 
     // We need to change the "localhost" part based on VM IP
     // Until we can figure out a separate server system to handle that
-    public static final String dburl = "jdbc:postgresql://localhost:5432/postgres";
-
+//  public static final String dburl = "jdbc:postgresql://localhost:5432/postgres";
+    public static final String dburl = "jdbc:postgresql://192.168.0.37:5432/postgres";
 }
