@@ -122,7 +122,9 @@
                   <v-btn class="ma-1" color="#F78CA2" @click="removeFromCart"
                     >Remove</v-btn
                   >
-                  <v-btn class="ma-1" color="#B0D9B1">Checkout</v-btn>
+                  <v-btn class="ma-1" color="#B0D9B1" @click="checkoutItem"
+                    >Checkout</v-btn
+                  >
                 </v-col>
               </v-row>
             </v-card>
@@ -205,6 +207,7 @@ export default {
     showMainPage: false,
     showTransactions: false,
     currentUser: "",
+    currentUserObj: {},
     buttonInitials: "",
 
     //Login Page
@@ -217,17 +220,21 @@ export default {
 
     //Main Page
     showCurrentCart: false,
-    currentItemInCart: { id: 0, item: "", category: "", specs: "", price: "" },
+    currentItemInCart: {},
     itemsForSale: [],
 
     //Transactions Page
-
     headers: [
-      { text: "Item Title", align: "start", sortable: false, value: "itemTitle" },
+      {
+        text: "Item Title",
+        align: "start",
+        sortable: false,
+        value: "itemTitle",
+      },
       { text: "Item Category", value: "itemCat" },
       { text: "Item Specifications", value: "itemSpecs" },
       { text: "Purchase Date", value: "purchaseDate" },
-      { text: "Purchase Time", value: "purchaseDate" },
+      { text: "Transaction Result", value: "itemResult" },
       { text: "Item Price", value: "itemPrice" },
     ],
     transactions: [],
@@ -236,43 +243,42 @@ export default {
     loginFunction() {
       let username = this.username;
       let password = this.password;
-      let userFound = false;
-      let correctIndex = -1;
+      let isUser = false;
 
-      for (let i = 0; i < this.savedUsers.length; i++) {
-        if (
-          this.savedUsers[i].username.toUpperCase === username.toUpperCase &&
-          password === this.savedUsers[i].password
-        ) {
-          userFound = true;
-          correctIndex = i;
+      let hash = this.hashPassword(password);
+
+      APIService.login(username, hash).then((tempUser) => {
+        if (tempUser.firstname != "") {
+          isUser = true;
+        } else {
+          isUser = false;
         }
-      }
 
-      if (userFound) {
-        APIService.getTransactions().then((response) => {
-          this.transactions = response.data;
+        if (isUser) {
+          this.currentUserObj = tempUser;
+          this.currentUser = tempUser.firstname + " " + tempUser.lastname;
+          this.buttonInitials =
+            tempUser.firstname.charAt(0) + tempUser.lastname.charAt(0);
 
-          console.log(this.transactions);
-        });
+          APIService.getTransactionsByUser(this.currentUserObj.username).then((response) => {
+            console.log(response);
+            this.transactions = response;
+          });
 
-        this.showLoginPage = false;
-        this.showMainPage = true;
-        this.showSnackbar = false;
+          this.showLoginPage = false;
+          this.showMainPage = true;
+          this.showSnackbar = false;
 
-        this.currentUser =
-          this.savedUsers[correctIndex].firstName +
-          " " +
-          this.savedUsers[correctIndex].lastName;
-        this.buttonInitials =
-          this.savedUsers[correctIndex].firstName.charAt(0) +
-          this.savedUsers[correctIndex].lastName.charAt(0);
-      } else {
-        this.showSnackbar = true;
-      }
+          
+        } else {
+          this.showSnackbar = true;
+        }
+      });
     },
     addItemToCart(item) {
       this.showCurrentCart = true;
+
+      console.log(item.item);
 
       this.currentItemInCart.title = item.item;
       this.currentItemInCart.id = item.id;
@@ -322,19 +328,92 @@ export default {
         price: "",
       };
     },
-    connectToDatebase() {},
+    hashPassword(password) {
+      let hash = 0;
+
+      for (let i = 0; i < password.length; i++) {
+        let char = password.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash = hash & hash;
+      }
+
+      return hash;
+    },
+    checkoutItem() {
+      let item = this.currentItemInCart;
+      let isAccepted = true;
+      let currDate = ""
+
+      if (item.price > 500) {
+        this.showSnackbar = true;
+        isAccepted = false;
+      } else {
+        if (item.qty <= 0) {
+          this.showSnackbar = true;
+          this.reorderCertainItem();
+          return;
+        } else {
+          let balance = APIService.checkBalance(this.currentUser.username)
+
+          if(balance >= item.price){
+            const date = new Date();
+            
+            let month = date.getMonth() + 1;
+            let year = date.getFullYear();
+
+            let itemQty = APIService.checkItemQty(item.id);
+
+            if(itemQty >= 1){
+              let day = date.getDate() + 1;
+              currDate = `${month}-${day}-${year}`;
+            }else{
+              let day = date.getDate() + 5;
+              currDate = `${month}-${day}-${year}`;
+
+              this.reorderCertainItem();
+            }
+
+            
+          }else{
+            this.showSnackbar = true;
+            return;
+          }
+        }
+      }
+
+      let transaction = {
+        user: this.currentUser,
+        itemTitle: this.currentItemInCart.itemTitle,
+        itemId: this.currentItemInCart.itemId,
+        itemPrice: this.currentItemInCart.price,
+        itemCat: this.currentItemInCart.itemCat,
+        itemSpecs: this.currentItemInCart.itemSpecs,
+        date: currDate,
+        result: isAccepted,
+      }
+
+      let result = APIService.insertTransaction(transaction);
+
+      if(result){
+        this.currentItemInCart = {};
+        this.showCurrentCart = false;
+      }else{
+        this.showSnackbar = true;
+      }
+    },
+    reorderCertainItem() {
+      let result = APIService.reorderItem(this.currentItemInCart.itemId);
+
+      result
+    },
   },
   created() {
     APIService.getUsers().then((response) => {
       this.savedUsers = response.data;
-
-      console.log(this.savedUsers);
     });
 
     APIService.getStoreItems().then((response) => {
       this.itemsForSale = response.data;
-
-      console.log(this.itemsForSale);
     });
   },
 };
