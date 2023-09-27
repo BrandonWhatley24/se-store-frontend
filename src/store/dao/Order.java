@@ -101,9 +101,10 @@ public class Order {
 		this.expectedDate = expectedDate;
 	}
 
-	// Print Test
+	@Override
 	public String toString() {
-		return this.orderID + " -- " + this.orderDate;
+		return "Order [orderID=" + orderID + ", custID=" + custID + ", invID=" + invID + ", qty=" + qty + ", status="
+				+ status + ", pending=" + pending + ", orderDate=" + orderDate + ", expectedDate=" + expectedDate + "]";
 	}
     
 }

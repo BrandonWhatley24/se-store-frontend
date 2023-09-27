@@ -18,7 +18,31 @@ public class InventoryDAO implements DataAccess<Inventory> {
     String dburl = Parms.dburl;
     
     String driver = "org.postgresql.Driver";
-        
+    
+/*    
+	public static void main(String[] args) {
+		  
+		InventoryDAO idao = new InventoryDAO(); 
+		List<Inventory> list = idao.getAll();
+		
+		for(Inventory inv : list) { 
+			System.out.println(inv); 
+		}
+		  
+		int id = 30001; 
+		Inventory inv = idao.getItem(id);
+		System.out.println(inv);
+		
+		idao.updateQtyOnHand(id, 5);
+		inv = idao.getItem(id);
+		System.out.println(inv);
+		
+		idao.updateQtyOnHand(id, -5);
+		inv = idao.getItem(id);
+		System.out.println(inv);
+	}
+*/
+	
     // Returns a List of ALL Inventory
     public List<Inventory> getAll(){
         
@@ -59,7 +83,7 @@ public class InventoryDAO implements DataAccess<Inventory> {
             String sql = "SELECT * FROM STOREDB.INVENTORY WHERE INV_ID = (?)";
 
             pstmt = con.prepareStatement(sql);
-            pstmt.setString(1, String.valueOf(key));
+            pstmt.setInt(1, key);
             ResultSet rs = pstmt.executeQuery();
             
             while(rs.next()){
@@ -88,11 +112,11 @@ public class InventoryDAO implements DataAccess<Inventory> {
             Class.forName(driver);                
             con = DriverManager.getConnection(dburl, dbuser, dbpass);
             
-            String sql = "UPDATE STOREDB.INVENTORY SET QTY_ON_HAND = INV_QTY_ONHAND + (?) WHERE INV_ID = (?)";
+            String sql = "UPDATE STOREDB.INVENTORY SET QTY_ON_HAND = QTY_ON_HAND + (?) WHERE INV_ID = (?)";
         	
             pstmt = con.prepareStatement(sql);
-            pstmt.setString(1, String.valueOf(qty));
-            pstmt.setString(2, String.valueOf(invID));
+            pstmt.setInt(1, qty);
+            pstmt.setInt(2, invID);
             pstmt.execute();
             
             con.close();

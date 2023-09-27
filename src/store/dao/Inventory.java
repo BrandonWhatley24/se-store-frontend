@@ -2,7 +2,7 @@ package store.dao;
 
 public class Inventory {
     
-    private int invID;
+	private int invID;
     private String name;
     private double salePrice;
     private double costForUs;
@@ -76,4 +76,10 @@ public class Inventory {
 		this.turnaround = turnaround;
 	}
 	
+    @Override
+	public String toString() {
+		return "Inventory [invID=" + invID + ", name=" + name + ", salePrice=" + salePrice + ", costForUs=" + costForUs
+				+ ", qtyOnHand=" + qtyOnHand + ", factory=" + factory + ", turnaround=" + turnaround + "]";
+	}
+    
 }

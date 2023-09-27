@@ -19,6 +19,19 @@ public class CustomerDAO implements DataAccess<Customer>{
 
     String driver = "org.postgresql.Driver";
 	
+  /*  
+	public static void main(String[] args) {
+	  
+		CustomerDAO cdao = new CustomerDAO(); List<Customer> list = cdao.getAll();
+		for(Customer cust : list) { System.out.println(cust); }
+		  
+		int id = 10001; 
+		Customer cust = cdao.getItem(id); 
+		System.out.println(cust);
+		  
+	}
+	*/
+    
     // Returns a List of ALL Customers
     public List<Customer> getAll(){
         
@@ -34,7 +47,7 @@ public class CustomerDAO implements DataAccess<Customer>{
             ResultSet rs = pstmt.executeQuery();             
             
             while(rs.next()){
-                Customer cust = new Customer(rs.getInt(1), rs.getString(2));
+                Customer cust = new Customer(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4));
                 list.add(cust);
             }
             
@@ -59,11 +72,11 @@ public class CustomerDAO implements DataAccess<Customer>{
             String sql = "SELECT * FROM STOREDB.CUSTOMERS WHERE CUSTOMER_ID = (?)";
 
             pstmt = con.prepareStatement(sql);
-            pstmt.setString(1, String.valueOf(key));
+            pstmt.setInt(1, key);
             ResultSet rs = pstmt.executeQuery();
 
             while(rs.next()){
-            	cust = new Customer(rs.getInt(1), rs.getString(2));
+            	cust = new Customer(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4));
             }
             
             con.close();

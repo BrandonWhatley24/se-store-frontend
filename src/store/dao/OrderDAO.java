@@ -3,6 +3,7 @@ package store.dao;
 import store.sec.Parms;
 import java.sql.ResultSet;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.util.List;
@@ -18,6 +19,35 @@ public class OrderDAO implements DataAccess<Order>{
     String dburl = Parms.dburl;    
 
     String driver = "org.postgresql.Driver";
+  /*  
+    public static void main(String[] args) {
+		
+    	OrderDAO odao = new OrderDAO();
+    	List<Order> list = odao.getAll();
+    	
+    	for(Order ord : list) {
+    		System.out.println(ord);
+    	}
+    	
+    	int id = 50001;
+    	Order ord = odao.getItem(id);
+    	System.out.println(ord);
+    	
+    	System.out.println("-------------");
+    //	Order(int custID, int invID, int qty, boolean status, boolean pending, Date expectedDate)  	
+    	Date date = new Date(System.currentTimeMillis() + (5 * 86400000));
+    	ord = new Order(10005, 30008, 25, true, true, date);
+    	odao.insert(ord);
+    	
+    	list = odao.getAll();
+    	
+    	for(Order ordz : list) {
+    		System.out.println(ordz);
+    	}
+    	
+	}
+    */
+    
     
     // Returns a List of ALL Orders
     public List<Order> getAll(){
@@ -59,7 +89,7 @@ public class OrderDAO implements DataAccess<Order>{
             String sql = "SELECT * FROM STOREDB.ORDERS WHERE CUSTOMER_ID = (?) ORDER BY ORDER_ID";
             
             pstmt = con.prepareStatement(sql);
-            pstmt.setString(1, String.valueOf(key));
+            pstmt.setInt(1, key);
             ResultSet rs = pstmt.executeQuery();
             
             while(rs.next()){
@@ -88,7 +118,7 @@ public class OrderDAO implements DataAccess<Order>{
             String sql = "SELECT * FROM STOREDB.ORDERS WHERE ORDER_ID = (?)";
             
             pstmt = con.prepareStatement(sql);
-            pstmt.setString(1, String.valueOf(key));
+            pstmt.setInt(1, key);
             ResultSet rs = pstmt.executeQuery();
             
             while(rs.next()){
