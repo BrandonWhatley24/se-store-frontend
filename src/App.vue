@@ -35,6 +35,14 @@
     </v-app-bar>
     <div class="background">
       <v-main>
+        <v-snackbar
+          v-model="showSnackbar"
+          :timeout="snackbarTimeout"
+          :color="snackbarColor"
+        >
+          {{ snackbarText }}</v-snackbar
+        >
+
         <!--Login Page-->
         <div v-show="showLoginPage">
           <v-row>
@@ -69,14 +77,6 @@
             </v-col>
             <v-col cols="3"> </v-col>
           </v-row>
-
-          <v-snackbar
-            v-model="showSnackbar"
-            :timeout="snackbarTimeout"
-            color="#F78CA2"
-          >
-            {{ snackbarText }}</v-snackbar
-          >
         </div>
 
         <!--Main Page-->
@@ -96,25 +96,21 @@
             width="100%"
             class="ml-2 mr-2 mb-4 mt-4"
           >
-            <v-card width="100%" color="#F6F4EB" class="mt-4 ml-3 mr-3 pa-4">
+            <v-card width="100%" color="#F6F4EB" class="mt-4 ml-3 mr-3 pa-2">
               <v-row>
                 <v-col cols="2">
-                  <h4 class="ma-3">
-                    {{ currentItemInCart.itemTitle }}
+                  <h4 class="ma-1">
+                    {{ this.currentItemInCart.itemTitle }}
                   </h4>
                 </v-col>
                 <v-col cols="3">
-                  <h4 class="ma-3">
-                    {{ currentItemInCart.itemCat }}
-                  </h4>
+                  <h4 class="ma-1"></h4>
                 </v-col>
                 <v-col cols="3">
-                  <h4 class="ma-3">
-                    {{ currentItemInCart.itemSpecs }}
-                  </h4>
+                  <h4 class="ma-1"></h4>
                 </v-col>
                 <v-col cols="2">
-                  <h4 class="ma-3">
+                  <h4 class="ma-1">
                     {{ currentItemInCart.itemPrice }}
                   </h4>
                 </v-col>
@@ -140,29 +136,25 @@
               v-for="item in itemsForSale"
               :key="item.itemId"
               width="23%"
-              height="200px"
+              height=""
               color="#F6F4EB"
               class="ml-5 mr-4 mb-3 mt-3"
             >
               <v-row>
-                <v-col cols="9"
+                <v-col cols="12"
                   ><v-card-title>{{ item.itemTitle }}</v-card-title></v-col
-                >
-                <v-col cols="3"
+                > </v-row
+              ><v-row>
+                <v-col cols="12"
                   ><v-card-title>{{ item.itemPrice }}</v-card-title></v-col
                 >
               </v-row>
-              <v-row class="ma-0">
-                <v-col cols="7"
-                  ><v-card-text>{{ item.itemCat }}</v-card-text></v-col
-                >
-              </v-row>
-              <v-row class="ma-0">
-                <v-col cols="6"
-                  ><v-card-text>{{ item.itemSpecs }}</v-card-text></v-col
-                >
-                <v-col cols="6"
-                  ><v-btn @click="addItemToCart(item)" color="#B0D9B1"
+              <v-row class="ma-2">
+                <v-col cols="8"
+                  ><v-btn
+                    @click="addItemToCart(item)"
+                    color="#B0D9B1"
+                    width="90%"
                     >Add Item to Cart</v-btn
                   ></v-col
                 >
@@ -216,6 +208,7 @@ export default {
     savedUsers: [],
     showSnackbar: false,
     snackbarText: "Your username or password is incorrect. Please try again",
+    snackbarColor: "#F78CA2",
     snackbarTimeout: 2000,
 
     //Main Page
@@ -231,8 +224,6 @@ export default {
         sortable: false,
         value: "itemTitle",
       },
-      { text: "Item Category", value: "itemCat" },
-      { text: "Item Specifications", value: "itemSpecs" },
       { text: "Purchase Date", value: "purchaseDate" },
       { text: "Transaction Result", value: "itemResult" },
       { text: "Item Price", value: "itemPrice" },
@@ -260,40 +251,35 @@ export default {
           this.buttonInitials =
             tempUser.firstname.charAt(0) + tempUser.lastname.charAt(0);
 
-          APIService.getTransactionsByUser(this.currentUserObj.username).then((response) => {
-            console.log(response);
-            this.transactions = response;
-          });
+          APIService.getTransactionsByUser(this.currentUserObj.username).then(
+            (response) => {
+              this.transactions = response;
+            }
+          );
 
           this.showLoginPage = false;
           this.showMainPage = true;
-          this.showSnackbar = false;
-
-          
         } else {
           this.showSnackbar = true;
+          this.snackbarText =
+            "Username is not in a our system and/or doesn't match the password";
+          this.snackbarColor = "#F78CA2";
         }
       });
     },
     addItemToCart(item) {
       this.showCurrentCart = true;
 
-      console.log(item.item);
-
-      this.currentItemInCart.title = item.item;
-      this.currentItemInCart.id = item.id;
-      this.currentItemInCart.category = item.category;
-      this.currentItemInCart.specs = item.specs;
-      this.currentItemInCart.price = item.price;
+      this.currentItemInCart.itemTitle = item.itemTitle;
+      this.currentItemInCart.itemId = item.itemId;
+      this.currentItemInCart.itemPrice = item.itemPrice;
     },
     removeFromCart() {
       this.showCurrentCart = false;
 
-      this.currentItemInCart.title = "";
-      this.currentItemInCart.id = 0;
-      this.currentItemInCart.category = "";
-      this.currentItemInCart.specs = "";
-      this.currentItemInCart.price = "";
+      this.currentItemInCart.itemTitle = "";
+      this.currentItemInCart.itemId = 0;
+      this.currentItemInCart.itemPrice = "";
     },
     openTransactions() {
       this.showLoginPage = false;
@@ -321,11 +307,9 @@ export default {
       this.password = "";
       this.currentUser = "";
       this.currentItemInCart = {
-        id: 0,
-        item: "",
-        category: "",
-        specs: "",
-        price: "",
+        itemId: 0,
+        itemTitle: "",
+        itemPrice: "",
       };
     },
     hashPassword(password) {
@@ -342,69 +326,80 @@ export default {
     checkoutItem() {
       let item = this.currentItemInCart;
       let isAccepted = true;
-      let currDate = ""
+      let currDate = "";
 
-      if (item.price > 500) {
+      if (item.itemPrice > 500) {
         this.showSnackbar = true;
+        this.snackbarText = "Purchase price cannot be over $500";
+        this.snackbarColor = "#F78CA2";
         isAccepted = false;
+        return;
       } else {
-        if (item.qty <= 0) {
-          this.showSnackbar = true;
-          this.reorderCertainItem();
-          return;
-        } else {
-          let balance = APIService.checkBalance(this.currentUser.username)
+        let balance = 0;
+        APIService.checkBalance(this.currentUserObj.username).then(
+          (response) => {
+            balance = response;
 
-          if(balance >= item.price){
-            const date = new Date();
-            
-            let month = date.getMonth() + 1;
-            let year = date.getFullYear();
+            if (balance >= item.itemPrice) {
+              const date = new Date();
 
-            let itemQty = APIService.checkItemQty(item.id);
+              let month = date.getMonth() + 1;
+              let year = date.getFullYear();
 
-            if(itemQty >= 1){
-              let day = date.getDate() + 1;
-              currDate = `${month}-${day}-${year}`;
-            }else{
-              let day = date.getDate() + 5;
-              currDate = `${month}-${day}-${year}`;
+              let itemQty = 0;
 
-              this.reorderCertainItem();
+              APIService.checkItemQty(item.itemId).then((response) => {
+                itemQty = response;
+
+                if (itemQty >= 1) {
+                  let day = date.getDate() + 1;
+                  currDate = `${month}-${day}-${year}`;
+                } else {
+                  let day = date.getDate() + 5;
+                  currDate = `${month}-${day}-${year}`;
+
+                  this.reorderCertainItem(item);
+                }
+              });
+            } else {
+              this.showSnackbar = true;
+              this.snackbarText = "insufficient funds for the purchase price";
+              this.snackbarColor = "#F78CA2";
+              isAccepted = false;
+              return;
             }
-
-            
-          }else{
-            this.showSnackbar = true;
-            return;
           }
-        }
+        )
       }
 
       let transaction = {
-        user: this.currentUser,
+        user: this.currentUserObj.username,
         itemTitle: this.currentItemInCart.itemTitle,
         itemId: this.currentItemInCart.itemId,
         itemPrice: this.currentItemInCart.price,
-        itemCat: this.currentItemInCart.itemCat,
-        itemSpecs: this.currentItemInCart.itemSpecs,
         date: currDate,
         result: isAccepted,
-      }
+      };
 
-      let result = APIService.insertTransaction(transaction);
+      let result = false;
+      APIService.insertTransaction(transaction).then((response) => {
+        result = response;
 
-      if(result){
-        this.currentItemInCart = {};
-        this.showCurrentCart = false;
-      }else{
-        this.showSnackbar = true;
-      }
+        if (result) {
+          this.currentItemInCart = {};
+          this.showCurrentCart = false;
+          this.showSnackbar = true;
+
+          this.snackbarColor = "#B0D9B1";
+        } else {
+          this.showSnackbar = true;
+          this.snackbarText = "Purchase of the item was unsuccessful";
+          this.snackbarColor = "#F78CA2";
+        }
+      });
     },
-    reorderCertainItem() {
-      let result = APIService.reorderItem(this.currentItemInCart.itemId);
-
-      result
+    reorderCertainItem(item) {
+      APIService.reorderItem(item.itemId);
     },
   },
   created() {
